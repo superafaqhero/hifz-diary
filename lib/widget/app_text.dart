@@ -13,13 +13,13 @@ class AppText extends StatefulWidget {
 
   AppText(
       {Key? key,
-      required this.text,
-      this.clr,
-      this.size,
-      this.fontWeight,
-      this.maxLines,
-      this.textDecoration,
-      this.textAlign})
+        required this.text,
+        this.clr,
+        this.size,
+        this.fontWeight,
+        this.maxLines,
+        this.textDecoration,
+        this.textAlign})
       : super(key: key);
 
   @override
@@ -27,6 +27,7 @@ class AppText extends StatefulWidget {
 }
 
 class _AppTextState extends State<AppText> {
+  bool isLoading = true;
   @override
   void initState() {
     translate();
@@ -38,7 +39,8 @@ class _AppTextState extends State<AppText> {
   Widget build(BuildContext context) {
     return Directionality(
         textDirection: lang == "en" ? TextDirection.ltr : TextDirection.rtl,
-        child: Text(
+        child: isLoading
+            ? Text("") : Text(
           widget.text,
           maxLines: widget.maxLines,
           textAlign: widget.textAlign,
@@ -63,6 +65,7 @@ class _AppTextState extends State<AppText> {
         widget.text = value.toString();
         temp = value.toString();
       });
+      isLoading = false;
     });
     return temp;
   }

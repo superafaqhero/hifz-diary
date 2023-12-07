@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hafiz_diary/NewScreens/join.dart';
 import 'package:hafiz_diary/authentication/role_page.dart';
 import 'package:hafiz_diary/staff/staff_class.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../admin/class_detail.dart';
 import '../admin/defaulter_students.dart';
@@ -21,6 +23,19 @@ class StaffHome extends StatefulWidget {
 
 class _StaffHomeState extends State<StaffHome> {
   @override
+  var  currectUserId;
+
+  Future<void> getCurrentUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      currectUserId = prefs.getString("currentUserId")!;
+      print("Current User id is**************** " + currectUserId.toString());
+    });
+  }
+  void initState(){
+    getCurrentUser();
+    super.initState();
+  }
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
@@ -46,12 +61,23 @@ class _StaffHomeState extends State<StaffHome> {
         ),
         actions: [
           InkWell(
-            onTap: () {
+            onTap: ()async {
+
+              SharedPreferences prefs =await SharedPreferences.getInstance();
+              prefs.setString("currentUserId", "");
+
+
+
+
+
+
+
+
               FirebaseAuth.instance.signOut().then(
                     (value) => Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => RolePage(),
+                        builder: (context) => Join(),
                       ),
                     ),
                   );
@@ -98,7 +124,7 @@ class _StaffHomeState extends State<StaffHome> {
                         .collection("classes")
                         .where("teachers",
                             arrayContains:
-                                FirebaseAuth.instance.currentUser!.uid)
+                            currectUserId)
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {

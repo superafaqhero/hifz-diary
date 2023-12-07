@@ -1,15 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hafiz_diary/NewScreens/new_create_profile.dart';
 import 'package:hafiz_diary/admin/class_detail.dart';
 import 'package:hafiz_diary/admin/defaulter_students.dart';
 import 'package:hafiz_diary/admin/staff_detail.dart';
 import 'package:hafiz_diary/admin/users_approval.dart';
 import 'package:hafiz_diary/authentication/login_screen.dart';
 import 'package:hafiz_diary/authentication/role_page.dart';
+import 'package:hafiz_diary/authentication/splash_screen.dart';
 import 'package:hafiz_diary/constants.dart';
 import 'package:hafiz_diary/notification/notification_screen.dart';
 import 'package:hafiz_diary/widget/app_text.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../NewScreens/join.dart';
+import '../widget/common_button.dart';
 
 class AdminHome extends StatefulWidget {
   const AdminHome({Key? key}) : super(key: key);
@@ -19,6 +25,25 @@ class AdminHome extends StatefulWidget {
 }
 
 class _AdminHomeState extends State<AdminHome> {
+  String? uId;
+
+  void initState() {
+
+    super.initState();
+    initMethod();
+  }
+
+  initMethod() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      uId=preferences.getString("currentUserId")!;
+    }
+    );
+
+
+
+
+  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -28,7 +53,8 @@ class _AdminHomeState extends State<AdminHome> {
         },
         child:
       Scaffold(
-      appBar: AppBar(
+      appBar:
+      AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: primaryColor,
         title: Column(
@@ -37,7 +63,7 @@ class _AdminHomeState extends State<AdminHome> {
             FutureBuilder(
                 future: FirebaseFirestore.instance
                     .collection("users")
-                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .doc(uId)
                     .get(),
                 builder: (context, snap) {
                   if (snap.hasData) {
@@ -45,6 +71,7 @@ class _AdminHomeState extends State<AdminHome> {
                       text: "Hi, ${snap.data!.get("name")}",
                       clr: Colors.white,
                       fontWeight: FontWeight.bold,
+
                     );
                   } else {
                     return const Center(
@@ -57,26 +84,11 @@ class _AdminHomeState extends State<AdminHome> {
               clr: Colors.white60,
               size: 11,
             ),
+
           ],
         ),
         actions: [
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const UserApproval(),
-                ),
-              );
-            },
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Icon(
-                Icons.supervised_user_circle_rounded,
-                color: Colors.white,
-              ),
-            ),
-          ),
+
           InkWell(
             onTap: () {
               Navigator.push(
@@ -93,15 +105,30 @@ class _AdminHomeState extends State<AdminHome> {
             ),
           ),
           InkWell(
-            onTap: () {
+            onTap: ()async {
+
+         /*  Navigator.push(context, MaterialPageRoute(builder: (context){
+             return SplashScreen();
+           }));*/
+
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.remove("currentUserId");
+
+
+
+
+
+
+
+
               FirebaseAuth.instance.signOut().then(
                     (value) => Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const RolePage(),
-                      ),
-                    ),
-                  );
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Join(),
+                  ),
+                ),
+              );
             },
             child: const Padding(
               padding: EdgeInsets.all(8.0),
@@ -125,6 +152,27 @@ class _AdminHomeState extends State<AdminHome> {
             padding: EdgeInsets.all(defPadding),
             child: Column(
               children: [
+                SizedBox(height: 20,),
+                SizedBox(
+                  width: 350,
+                  height: 50,
+                  child: CommonButton(
+                    width: 150,
+                    height: 50,
+                    text: "Create Profile",
+                    onTap: () {
+
+                     Navigator.push(context, MaterialPageRoute(builder: (context){
+                       return NewProfile();
+                     }));
+
+                    },
+                    color: primaryColor,
+                    textColor: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 20,),
+
                 Row(
                   children: [
                     AppText(
@@ -257,7 +305,8 @@ class _AdminHomeState extends State<AdminHome> {
                 StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection("classes")
-                        .snapshots(),
+                        .where("created_by", isEqualTo: uId)
+                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         return ListView.builder(

@@ -26,15 +26,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
   File? _img;
   String? url;
   int language = 0;
+  String? uId;
 
   @override
   void initState() {
+
     super.initState();
     initMethod();
   }
 
   initMethod() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
+ setState(() {
+   uId=preferences.getString("currentUserId")!;
+ }
+ );
+
+
+
     String lang = preferences.getString("lang") ?? "eng";
     language = lang == "ur" ? 0 : 1;
   }
@@ -62,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
                 future: FirebaseFirestore.instance
                     .collection("users")
-                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .doc(uId)
                     .get(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {

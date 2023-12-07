@@ -4,12 +4,18 @@ import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hafiz_diary/NewScreens/join.dart';
+import 'package:hafiz_diary/admin/bottom_navigation.dart';
+import 'package:hafiz_diary/authentication/sign_up.dart';
+import 'package:hafiz_diary/notes/notes_screen.dart';
 import 'package:hafiz_diary/provider/provider_class.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'NewScreens/new_login.dart';
+import 'NewScreens/new_create_profile.dart';
 import 'authentication/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'constants.dart';
@@ -59,11 +65,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Hafiz Diary',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const SplashScreen(),
+      home: SplashScreen(),
     );
   }
 }

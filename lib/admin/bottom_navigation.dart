@@ -10,6 +10,7 @@ import 'package:hafiz_diary/profile/profile_screen.dart';
 import 'package:hafiz_diary/widget/TextFormField.dart';
 import 'package:hafiz_diary/widget/app_text.dart';
 import 'package:hafiz_diary/widget/common_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminHomeNavigation extends StatefulWidget {
   const AdminHomeNavigation({Key? key}) : super(key: key);
@@ -22,10 +23,19 @@ class _AdminHomeNavigationState extends State<AdminHomeNavigation> {
   TextEditingController classNameController = TextEditingController();
   TextEditingController classCodeController = TextEditingController();
   TextEditingController classDescController = TextEditingController();
+  var currentUserId;
   final _formKey = GlobalKey<FormState>();
   int Value = 0;
   @override
+  getCurrentUserId()async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      currentUserId= prefs.getString("currentUserId") ;
+    });
+
+  }
   void initState() {
+     getCurrentUserId();
     setState(() {
       classCodeController.text = Random().nextInt(100000).toString();
     });
@@ -33,13 +43,17 @@ class _AdminHomeNavigationState extends State<AdminHomeNavigation> {
     super.initState();
   }
 
+
+
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
+  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static  List<Widget> _widgetOptions = <Widget>[
+
     AdminHome(),
     NotesScreen(),
     ProfileScreen(),
+
   ];
   void _onItemTapped(int index) {
     setState(() {
@@ -52,18 +66,25 @@ class _AdminHomeNavigationState extends State<AdminHomeNavigation> {
     return Scaffold(
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton(
-              backgroundColor: primaryColor,
-              onPressed: () {
-                _createClass();
-              },
-              child: const Icon(
-                Icons.add,
-                color: Colors.white,
-              ),
-            )
+        backgroundColor: primaryColor,
+        onPressed: () {
+          _createClass();
+        },
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+      )
           : SizedBox(),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+      body: Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+
+          Expanded(
+            child: _widgetOptions.elementAt(_selectedIndex),
+          ),
+
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -137,7 +158,7 @@ class _AdminHomeNavigationState extends State<AdminHomeNavigation> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: CommonButton(
-                text: "Create Class",
+                text: "Create Class--------------",
                 onTap: () {
                   if (_formKey.currentState!.validate()) {
                     FirebaseFirestore.instance.collection("classes").add({
@@ -145,7 +166,7 @@ class _AdminHomeNavigationState extends State<AdminHomeNavigation> {
                       "class_code": classCodeController.text,
                       "teachers": [],
                       "students": [],
-                      "created_by": FirebaseAuth.instance.currentUser!.uid,
+                      "created_by": currentUserId.toString(),
                       "class_desc": classDescController.text,
                     }).then((value) {
                       Navigator.pop(context);

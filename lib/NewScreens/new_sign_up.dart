@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:hafiz_diary/NewScreens/new_create_profile.dart';
+import 'package:hafiz_diary/NewScreens/new_login.dart';
 import 'package:hafiz_diary/authentication/login_screen.dart';
+import 'package:hafiz_diary/profile/profile_screen.dart';
 import 'package:hafiz_diary/services/auth_services.dart';
 
 import '../constants.dart';
 import '../widget/TextFormField.dart';
 import '../widget/app_text.dart';
 import '../widget/common_button.dart';
-import 'role_page.dart';
 
-class SignUp extends StatefulWidget {
+
+class NewSignUp extends StatefulWidget {
   final String accountType;
-  const SignUp({Key? key, required this.accountType}) : super(key: key);
+  const NewSignUp({Key? key, required this.accountType}) : super(key: key);
 
   @override
-  State<SignUp> createState() => _SignUpState();
+  State<NewSignUp> createState() => _NewSignUpState();
 }
 
-class _SignUpState extends State<SignUp> {
+class _NewSignUpState extends State<NewSignUp> {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
@@ -27,7 +30,7 @@ class _SignUpState extends State<SignUp> {
     'Staff',
     'Student',
   ];
-  String accountType = "Staff";
+  String accountType = "0";
 
   @override
   Widget build(BuildContext context) {
@@ -38,16 +41,18 @@ class _SignUpState extends State<SignUp> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(defPadding),
+            padding: EdgeInsets.all(defPadding*2),
             child: Form(
               key: formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+
                   Image.asset(
                     "assets/images/logo.png",
                     width: 200,
+                    height: 200,
                     // height: 300,
                   ),
                   SizedBox(height: 60,),
@@ -103,22 +108,27 @@ class _SignUpState extends State<SignUp> {
                   CommonButton(
                     text: "Sign Up",
                     onTap: () {
-                      if (formKey.currentState!.validate()) {
-                        authServices.signup(
-                            data: {
-                              "name": nameController.text,
-                              "email": emailController.text,
-                              "phone": phoneController.text,
-                              "type": widget.accountType == "Staff" ? 1 : 2,
-                              "status": false,
-                              "remarks": "pending",
-                              "img_url": ""
-                            },
-                            context: context,
-                            email: emailController.text.trim(),
-                            password: passwordController.text.trim());
-                      }
-                    },
+    if (formKey.currentState!.validate()) {
+    authServices.signup(
+    data: {
+    "name": nameController.text,
+    "email": emailController.text,
+    "phone": phoneController.text,
+    "type": 0,
+    "status": true,
+    "remarks": "approved",
+    "img_url": ""
+    },
+    context: context,
+    email: emailController.text.trim(),
+    password: passwordController.text.trim());
+    }
+
+
+
+                      },
+
+
                     color: primaryColor,
                     textColor: Colors.white,
                   ),
@@ -139,10 +149,7 @@ class _SignUpState extends State<SignUp> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LoginScreen(
-                                accountType: widget.accountType,
-                                isAdmin: false,
-                              ),
+                              builder: (context) => NewLogin()
                             ),
                           );
                         },
